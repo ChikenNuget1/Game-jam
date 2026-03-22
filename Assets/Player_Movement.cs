@@ -15,29 +15,29 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        // Get Input Key
         Vector2 input = Vector2.zero;
         if (Keyboard.current.wKey.isPressed) input.y += 1;
         if (Keyboard.current.sKey.isPressed) input.y -= 1;
         if (Keyboard.current.aKey.isPressed) input.x -= 1;
         if (Keyboard.current.dKey.isPressed) input.x += 1;
 
-        // Normalize raw input FIRST (fixes diagonal speed)
+        // Normalise input to allow for consistent movement in 8 directions
         input = input.normalized;
 
-        // THEN apply isometric transformation
         movement = new Vector2(
             input.x,
-            input.y * 0.5f
+            input.y * 0.5f      // Half the movement in the y-direction because isometric means the y-direction is halved. Allows for consistent movement :D
         );
 
-        // No second normalize here — it would break the isometric ratio
-
+        
         if (movement != Vector2.zero)
             lastDirection = movement;
     }
 
     void FixedUpdate()
     {
+        // Apply movement
         rb.linearVelocity = movement * moveSpeed;
     }
 }
