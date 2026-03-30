@@ -10,8 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dadccd22fe07641ba989fddd25e69848, type: 3}
-  m_Name: Fish
+  m_Name: Rod
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
-  itemName: Fish
-  icon: {fileID: 21300000, guid: 800079fa6f78a432fb76071e465f4905, type: 3}
-  maxStackSize: 5
+  itemName: Fishing Rod
+  icon: {fileID: 21300000, guid: 8832301ac89a34dd9afea187ce4d9505, type: 3}
+  maxStackSize: 1
+  description: this is a fishing rod
