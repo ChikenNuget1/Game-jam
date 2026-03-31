@@ -22,38 +22,104 @@ public class Inventory : MonoBehaviour
     public TextMeshProUGUI descriptionItemNameTxt;
     public TextMeshProUGUI itemDescriptionTxt;
 
+    public GameObject contextMenu;
+    public Button equipButton;
+    public Button dropButton;
+    private Slot contextSlot = null;
+
     private void Awake()
     {
         inventorySlots.AddRange(inventorySlotParent.GetComponentsInChildren<Slot>());
-        dragIcon.enabled = false; // hide drag icon on start
+
+        if (dragIcon != null)
+            dragIcon.enabled = false;
+
+        contextMenu.SetActive(false);
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.F))
-        {
             AddItem(fish, 1);
-        }
         else if (Input.GetKeyDown(KeyCode.R))
-        {
             AddItem(rod, 1);
-        }
-        if(Input.GetKeyDown(KeyCode.Tab))
-        {
+
+        if (Input.GetKeyDown(KeyCode.Tab))
             container.SetActive(!container.activeInHierarchy);
-        }
+
+        HandleRightClick();
         StartDrag();
         UpdateDragItemPosition();
         EndDrag();
-
         UpdateItemDescription();
+
+        // close context menu if clicked elsewhere
+        if (Mouse.current.leftButton.wasPressedThisFrame && contextMenu.activeSelf)
+        {
+            // only close if click was NOT on the context menu
+            if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+                CloseContextMenu();
+        }
+    }
+
+    private void HandleRightClick()
+    {
+        if (Mouse.current.rightButton.wasPressedThisFrame)
+        {
+            Slot hovered = GetHoveredSlot();
+
+            if (hovered != null && hovered.HasItem())
+            {
+                contextSlot = hovered;
+                contextMenu.SetActive(true);
+
+                // position at bottom right of the slot
+                RectTransform slotRect = hovered.GetComponent<RectTransform>();
+                RectTransform menuRect = contextMenu.GetComponent<RectTransform>();
+
+                Vector3[] corners = new Vector3[4];
+                slotRect.GetWorldCorners(corners);
+
+                // corners: 0 = bottom left, 1 = top left, 2 = top right, 3 = bottom right
+                contextMenu.transform.position = corners[3];
+            }
+            else
+            {
+                CloseContextMenu();
+            }
+        }
+    }
+    public void OnEquipClicked()
+    {
+        if (contextSlot == null || !contextSlot.HasItem()) return;
+
+        ItemSO item = contextSlot.GetItem();
+        Debug.Log("Equipped: " + item.itemName);
+        // add equip logic here
+
+        CloseContextMenu();
+    }
+
+    public void OnDropClicked()
+    {
+        if (contextSlot == null || !contextSlot.HasItem()) return;
+
+        Debug.Log("Dropped: " + contextSlot.GetItem().itemName);
+        contextSlot.ClearSlot();
+
+        CloseContextMenu();
+    }
+
+    private void CloseContextMenu()
+    {
+        contextMenu.SetActive(false);
+        contextSlot = null;
     }
 
     public void AddItem(ItemSO itemToAdd, int amount)
     {
         int remaining = amount;
 
-        // fill existing stacks
         foreach (Slot slot in inventorySlots)
         {
             if (slot.HasItem() && slot.GetItem() == itemToAdd)
@@ -75,7 +141,6 @@ public class Inventory : MonoBehaviour
             }
         }
 
-        // fill empty slots
         foreach (Slot slot in inventorySlots)
         {
             if (!slot.HasItem())
@@ -104,7 +169,6 @@ public class Inventory : MonoBehaviour
                 draggedSlot = hovered;
                 isDragging = true;
 
-                // show drag icon
                 dragIcon.sprite = hovered.GetItem().icon;
                 dragIcon.color = new Color(1, 1, 1, 0.5f);
                 dragIcon.enabled = true;
@@ -121,7 +185,6 @@ public class Inventory : MonoBehaviour
             if (hovered != null)
                 HandleDrop(draggedSlot, hovered);
 
-            // always reset drag state on mouse up
             dragIcon.enabled = false;
             draggedSlot = null;
             isDragging = false;
@@ -142,7 +205,6 @@ public class Inventory : MonoBehaviour
     {
         if (from == to) return;
 
-        // stacking
         if (to.HasItem() && to.GetItem() == from.GetItem())
         {
             int max = to.GetItem().maxStackSize;
@@ -162,7 +224,6 @@ public class Inventory : MonoBehaviour
             }
         }
 
-        // different item
         if (to.HasItem())
         {
             ItemSO tempItem = to.GetItem();
@@ -173,7 +234,6 @@ public class Inventory : MonoBehaviour
             return;
         }
 
-        // empty slot
         to.SetItem(from.GetItem(), from.GetAmount());
         from.ClearSlot();
     }
@@ -181,28 +241,27 @@ public class Inventory : MonoBehaviour
     private void UpdateDragItemPosition()
     {
         if (isDragging)
-        {
             dragIcon.transform.position = Mouse.current.position.ReadValue();
-        }
     }
 
     private void UpdateItemDescription()
     {
         Slot hoveredSlot = GetHoveredSlot();
 
-        if(hoveredSlot != null)
+        if (hoveredSlot != null)
         {
             ItemSO hoveredItem = hoveredSlot.GetItem();
 
-            if(hoveredItem != null)
+            if (hoveredItem != null)
             {
                 itemDescriptionParent.SetActive(true);
                 itemDescriptionImage.sprite = hoveredItem.icon;
                 itemDescriptionTxt.text = hoveredItem.description;
-                descriptionItemNameTxt.text = hoveredItem.name;
+                descriptionItemNameTxt.text = hoveredItem.itemName;
                 return;
             }
         }
+
         itemDescriptionParent.SetActive(false);
     }
 }
