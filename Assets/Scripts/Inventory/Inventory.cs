@@ -9,9 +9,8 @@ public class Inventory : MonoBehaviour
     public ItemSO fish;
     public ItemSO rod;
 
-    public GameObject inventorySlotParent;
-    private List<Slot> inventorySlots = new List<Slot>();
-    public GameObject container;
+    public GameObject hotbarSlotParent;
+    private List<Slot> hotbarSlots = new List<Slot>();
 
     public Image dragIcon;
     private Slot draggedSlot = null;
@@ -22,19 +21,34 @@ public class Inventory : MonoBehaviour
     public TextMeshProUGUI descriptionItemNameTxt;
     public TextMeshProUGUI itemDescriptionTxt;
 
-    public GameObject contextMenu;
-    public Button equipButton;
-    public Button dropButton;
-    private Slot contextSlot = null;
+    private int selectedSlotIndex = 0;
+    private Slot selectedSlot = null;
+
+    private KeyCode[] hotbarKeys = new KeyCode[]
+    {
+        KeyCode.Alpha1,
+        KeyCode.Alpha2,
+        KeyCode.Alpha3,
+        KeyCode.Alpha4,
+        KeyCode.Alpha5,
+        KeyCode.Alpha6,
+        KeyCode.Alpha7,
+        KeyCode.Alpha8,
+        KeyCode.Alpha9,
+    };
 
     private void Awake()
     {
-        inventorySlots.AddRange(inventorySlotParent.GetComponentsInChildren<Slot>());
+        hotbarSlots.AddRange(hotbarSlotParent.GetComponentsInChildren<Slot>());
 
         if (dragIcon != null)
             dragIcon.enabled = false;
+    }
 
-        contextMenu.SetActive(false);
+    void Start()
+    {
+        AddItem(rod, 1);
+        SelectSlot(0);
     }
 
     void Update()
@@ -44,83 +58,67 @@ public class Inventory : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.R))
             AddItem(rod, 1);
 
-        if (Input.GetKeyDown(KeyCode.Tab))
-            container.SetActive(!container.activeInHierarchy);
+        // select hotbar slot by key
+        for (int i = 0; i < hotbarKeys.Length && i < hotbarSlots.Count; i++)
+        {
+            if (Input.GetKeyDown(hotbarKeys[i]))
+            {
+                SelectSlot(i);
+                break;
+            }
+        }
 
-        HandleRightClick();
         StartDrag();
         UpdateDragItemPosition();
         EndDrag();
         UpdateItemDescription();
+    }
 
-        // close context menu if clicked elsewhere
-        if (Mouse.current.leftButton.wasPressedThisFrame && contextMenu.activeSelf)
+    private void SelectSlot(int index)
+    {
+        // don't select if slot is empty
+        if (!hotbarSlots[index].HasItem()) return;
+
+        // unequip item in previous slot
+        if (selectedSlot != null)
         {
-            // only close if click was NOT on the context menu
-            if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
-                CloseContextMenu();
+            selectedSlot.SetSelected(false);
+            if (selectedSlot.HasItem())
+            {
+                selectedSlot.GetItem().isEquipped = false;
+                Debug.Log(selectedSlot.GetItem().itemName + " has been unequipped.");
+            }
+        }
+
+        selectedSlotIndex = index;
+        selectedSlot = hotbarSlots[index];
+        selectedSlot.SetSelected(true);
+
+        if (selectedSlot.HasItem())
+        {
+            selectedSlot.GetItem().isEquipped = true;
+            Debug.Log(selectedSlot.GetItem().itemName + " has been equipped.");
         }
     }
 
-    private void HandleRightClick()
+    public Slot GetSelectedSlot()
     {
-        if (Mouse.current.rightButton.wasPressedThisFrame)
-        {
-            Slot hovered = GetHoveredSlot();
-
-            if (hovered != null && hovered.HasItem())
-            {
-                contextSlot = hovered;
-                contextMenu.SetActive(true);
-
-                // position at bottom right of the slot
-                RectTransform slotRect = hovered.GetComponent<RectTransform>();
-                RectTransform menuRect = contextMenu.GetComponent<RectTransform>();
-
-                Vector3[] corners = new Vector3[4];
-                slotRect.GetWorldCorners(corners);
-
-                // corners: 0 = bottom left, 1 = top left, 2 = top right, 3 = bottom right
-                contextMenu.transform.position = corners[3];
-            }
-            else
-            {
-                CloseContextMenu();
-            }
-        }
-    }
-    public void OnEquipClicked()
-    {
-        if (contextSlot == null || !contextSlot.HasItem()) return;
-
-        ItemSO item = contextSlot.GetItem();
-        Debug.Log("Equipped: " + item.itemName);
-        // add equip logic here
-
-        CloseContextMenu();
+        return selectedSlot;
     }
 
-    public void OnDropClicked()
+    public ItemSO GetSelectedItem()
     {
-        if (contextSlot == null || !contextSlot.HasItem()) return;
-
-        Debug.Log("Dropped: " + contextSlot.GetItem().itemName);
-        contextSlot.ClearSlot();
-
-        CloseContextMenu();
-    }
-
-    private void CloseContextMenu()
-    {
-        contextMenu.SetActive(false);
-        contextSlot = null;
+        if (selectedSlot != null && selectedSlot.HasItem())
+            return selectedSlot.GetItem();
+        return null;
     }
 
     public void AddItem(ItemSO itemToAdd, int amount)
     {
         int remaining = amount;
 
-        foreach (Slot slot in inventorySlots)
+        // fill existing stacks
+        foreach (Slot slot in hotbarSlots)
         {
             if (slot.HasItem() && slot.GetItem() == itemToAdd)
             {
@@ -136,12 +134,16 @@ public class Inventory : MonoBehaviour
                     remaining -= amountToAdd;
 
                     if (remaining <= 0)
+                    {
+                        SelectSlot(selectedSlotIndex);
                         return;
+                    }
                 }
             }
         }
 
-        foreach (Slot slot in inventorySlots)
+        // fill empty slots
+        foreach (Slot slot in hotbarSlots)
         {
             if (!slot.HasItem())
             {
@@ -150,12 +152,17 @@ public class Inventory : MonoBehaviour
                 remaining -= amountToPlace;
 
                 if (remaining <= 0)
+                {
+                    SelectSlot(selectedSlotIndex);
                     return;
+                }
             }
         }
 
         if (remaining > 0)
-            Debug.Log("Inventory is full, could not add " + remaining + " of " + itemToAdd.itemName);
+            Debug.Log("Hotbar is full, could not add " + remaining + " of " + itemToAdd.itemName);
+
+        SelectSlot(selectedSlotIndex);
     }
 
     private void StartDrag()
@@ -188,12 +195,14 @@ public class Inventory : MonoBehaviour
             dragIcon.enabled = false;
             draggedSlot = null;
             isDragging = false;
+
+            SelectSlot(selectedSlotIndex);
         }
     }
 
     private Slot GetHoveredSlot()
     {
-        foreach (Slot s in inventorySlots)
+        foreach (Slot s in hotbarSlots)
         {
             if (s.hovering)
                 return s;

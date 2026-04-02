@@ -8,4 +8,5 @@ public class ItemSO : ScriptableObject
     public Sprite icon;
     public int maxStackSize;
     public string description;
+    public bool isEquipped;
 }

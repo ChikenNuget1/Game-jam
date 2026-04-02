@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     public float moveSpeed = 5f;
+    public bool canMove = true;
     private Rigidbody2D rb;
     private Vector2 movement;
     private Vector2 lastDirection;
@@ -15,6 +16,11 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        if (!canMove)
+        {
+            movement = Vector2.zero;
+            return;
+        }
         // Get Input Key
         Vector2 input = Vector2.zero;
         if (Keyboard.current.wKey.isPressed) input.y += 1;
