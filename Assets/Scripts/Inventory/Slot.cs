@@ -11,10 +11,27 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     private Image iconImage;
     private TextMeshProUGUI amountTxt;
 
+    [Header("Selection")]
+    public Image slotBackground; // assign the slot's background Image in Inspector
+    public Color normalColor = new Color(1, 1, 1, 0.5f);
+    public Color selectedColor = new Color(1, 1, 0, 1f);
+    private bool isSelected = false;
+
     private void Awake()
     {
         iconImage = transform.GetChild(0).GetComponent<Image>();
         amountTxt = transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+
+        if (slotBackground != null)
+            slotBackground.color = normalColor;
+    }
+
+    public void SetSelected(bool selected)
+    {
+        isSelected = selected;
+
+        if (slotBackground != null)
+            slotBackground.color = isSelected ? selectedColor : normalColor;
     }
 
     public ItemSO GetItem()
@@ -24,7 +41,7 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public int GetAmount()
     {
-        return itemAmount; 
+        return itemAmount;
     }
 
     public void SetItem(ItemSO item, int amount = 1)
@@ -37,12 +54,13 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public void UpdateSlot()
     {
-        if(heldItem != null)
+        if (heldItem != null)
         {
             iconImage.enabled = true;
             iconImage.sprite = heldItem.icon;
             amountTxt.text = itemAmount.ToString();
-        } else
+        }
+        else
         {
             iconImage.enabled = false;
             amountTxt.text = "";
@@ -59,13 +77,10 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     public int RemoveAmount(int amount)
     {
         itemAmount -= amount;
-        if(itemAmount <= 0)
-        {
+        if (itemAmount <= 0)
             ClearSlot();
-        } else
-        {
+        else
             UpdateSlot();
-        }
         return itemAmount;
     }
 
@@ -90,4 +105,4 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         hovering = false;
     }
-}   
+}
