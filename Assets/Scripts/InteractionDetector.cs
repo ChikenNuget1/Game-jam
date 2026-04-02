@@ -1,29 +1,41 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class InteractionDetector : MonoBehaviour
 {
-    private IInteractable interactableInRange = null; // Closest Interactable
+    private IInteractable interactableInRange = null;
+    public GameObject interactionIcon;
+    public float iconHeightOffset = 0f;
 
     void Start()
     {
+        interactionIcon.SetActive(false);
     }
 
-    public void OnInteract(InputAction.CallbackContext context)
+    void Update()
     {
-        if (context.performed)
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            interactableInRange?.Interact();
+            Debug.Log("E pressed. interactableInRange: " + (interactableInRange != null ? "assigned" : "null"));
+            if (interactableInRange != null)
+                interactableInRange.Interact();
+        }
+
+        if (interactableInRange != null && interactionIcon.activeSelf)
+        {
+            MonoBehaviour mb = interactableInRange as MonoBehaviour;
+            if (mb != null)
+                interactionIcon.transform.position = mb.transform.position + new Vector3(0, iconHeightOffset, 0);
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        Debug.Log("Trigger entered by: " + collision.gameObject.name);
         if (collision.TryGetComponent(out IInteractable interactable) && interactable.CanInteract())
         {
+            Debug.Log("Interactable found: " + collision.gameObject.name);
             interactableInRange = interactable;
+            interactionIcon.SetActive(true);
         }
     }
 
@@ -32,6 +44,7 @@ public class InteractionDetector : MonoBehaviour
         if (collision.TryGetComponent(out IInteractable interactable) && interactable == interactableInRange)
         {
             interactableInRange = null;
+            interactionIcon.SetActive(false);
         }
     }
 }

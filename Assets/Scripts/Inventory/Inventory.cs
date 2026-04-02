@@ -47,6 +47,7 @@ public class Inventory : MonoBehaviour
 
     void Start()
     {
+        AddItem(rod, 1);
         SelectSlot(0);
     }
 
@@ -67,13 +68,6 @@ public class Inventory : MonoBehaviour
             }
         }
 
-        // scroll wheel to cycle slots
-        float scroll = Mouse.current.scroll.ReadValue().y;
-        if (scroll > 0f)
-            SelectSlot((selectedSlotIndex - 1 + hotbarSlots.Count) % hotbarSlots.Count);
-        else if (scroll < 0f)
-            SelectSlot((selectedSlotIndex + 1) % hotbarSlots.Count);
-
         StartDrag();
         UpdateDragItemPosition();
         EndDrag();
@@ -82,23 +76,29 @@ public class Inventory : MonoBehaviour
 
     private void SelectSlot(int index)
     {
+        // don't select if slot is empty
+        if (!hotbarSlots[index].HasItem()) return;
+
         // unequip item in previous slot
         if (selectedSlot != null)
         {
             selectedSlot.SetSelected(false);
             if (selectedSlot.HasItem())
+            {
                 selectedSlot.GetItem().isEquipped = false;
                 Debug.Log(selectedSlot.GetItem().itemName + " has been unequipped.");
+            }
         }
 
         selectedSlotIndex = index;
         selectedSlot = hotbarSlots[index];
         selectedSlot.SetSelected(true);
 
-        // equip item in new slot
-        if (selectedSlot.HasItem() && selectedSlot.GetItem().isEquipped == false)
+        if (selectedSlot.HasItem())
+        {
             selectedSlot.GetItem().isEquipped = true;
             Debug.Log(selectedSlot.GetItem().itemName + " has been equipped.");
+        }
     }
 
     public Slot GetSelectedSlot()

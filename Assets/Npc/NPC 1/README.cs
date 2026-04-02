@@ -1,4 +1,4 @@
-// NOT A SCRIPT JUST DETAILS
+// NOT A SCRIPT JUST DETAILS - Lucas :)
 
 // in each npc folder, should go:
 // sprite

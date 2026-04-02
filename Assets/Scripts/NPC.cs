@@ -13,16 +13,22 @@ public class NPC : MonoBehaviour, IInteractable
     private int dialogueIndex;
     private bool isTyping, isDialogueActive;
 
+    public GameObject hotbar;
+    public PlayerMovement playerMovement;
+
     public bool CanInteract()
     {
-        return !isDialogueActive;
+        bool canInteract = !isDialogueActive;
+        return canInteract;
     }
 
     public void Interact()
     {
-        // If no dialogue data or the game is paused and no dialogue is active
-        if (dialogueData == null || (PauseController.IsGamePaused && !isDialogueActive))
+
+        if (dialogueData == null)
+        {
             return;
+        }
 
         if (isDialogueActive)
         {
@@ -36,6 +42,9 @@ public class NPC : MonoBehaviour, IInteractable
 
     void StartDialogue()
     {
+        if (playerMovement != null)
+        playerMovement.canMove = false;
+
         isDialogueActive = true;
         dialogueIndex = 0;
 
@@ -43,23 +52,23 @@ public class NPC : MonoBehaviour, IInteractable
         portraitImage.sprite = dialogueData.npcPortrait;
 
         dialoguePanel.SetActive(true);
-        PauseController.SetPause(true);
 
         StartCoroutine(TypeLine());
+
+        if (hotbar != null)
+            hotbar.SetActive(false);
     }
 
     void NextLine()
     {
         if (isTyping)
         {
-            // Skip typing animation and show the full line
             StopAllCoroutines();
             dialogueText.SetText(dialogueData.dialogueLines[dialogueIndex]);
             isTyping = false;
         }
         else if (++dialogueIndex < dialogueData.dialogueLines.Length)
         {
-            // If another line, type next line
             StartCoroutine(TypeLine());
         }
         else
@@ -94,6 +103,9 @@ public class NPC : MonoBehaviour, IInteractable
         isDialogueActive = false;
         dialogueText.SetText("");
         dialoguePanel.SetActive(false);
-        PauseController.SetPause(false);
+        if (hotbar != null)
+            hotbar.SetActive(true);
+        if (playerMovement != null)
+            playerMovement.canMove = true;
     }
 }
