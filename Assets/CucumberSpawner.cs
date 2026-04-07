@@ -35,8 +35,9 @@ public class CucumberSpawner : MonoBehaviour
 
             Vector3Int cellPos = tilemap.WorldToCell(mouseWorld);
 
-            // Cucumber only spawns on tiles that exist
-            if (tilemap.HasTile(cellPos))
+            // Cucumber only spawns on tiles that exist and another cucumber doesn't already exist
+            GameObject target = GameObject.FindWithTag("Cucumber");
+            if (tilemap.HasTile(cellPos) && target == null)
             {
                 Vector3 spawnPos = tilemap.GetCellCenterWorld(cellPos);
 

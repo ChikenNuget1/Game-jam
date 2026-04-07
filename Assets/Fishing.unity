@@ -150,6 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   tilemap: {fileID: 2045704443}
   cucumber: {fileID: 6000441786873775157, guid: 30188c1cdad6d1f40bc19dbbd9ede8c4, type: 3}
+  actionDelay: 0.2
 --- !u!4 &103447513
 Transform:
   m_ObjectHideFlags: 0
@@ -197,6 +198,7 @@ MonoBehaviour:
   cat: {fileID: 437446110932019504, guid: b112802789e8fdc48a196417bdcfa905, type: 3}
   tilemap: {fileID: 2045704443}
   spawnCount: 5
+  cucumberSpawner: {fileID: 103447512}
 --- !u!4 &1181224299
 Transform:
   m_ObjectHideFlags: 0
@@ -837,8 +839,8 @@ Tilemap:
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Origin: {x: -3, y: -6, z: 0}
-  m_Size: {x: 5, y: 9, z: 1}
+  m_Origin: {x: -4, y: -6, z: 0}
+  m_Size: {x: 6, y: 9, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
