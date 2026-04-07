@@ -4,7 +4,6 @@ using UnityEngine.Tilemaps;
 
 public class Spawner : MonoBehaviour
 {
-
     public GameObject cat;
     public Tilemap tilemap;
 
@@ -12,6 +11,8 @@ public class Spawner : MonoBehaviour
 
     // Store occupied cells
     private HashSet<Vector3Int> occupiedCells = new HashSet<Vector3Int>();
+
+    public CucumberSpawner cucumberSpawner;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -55,6 +56,7 @@ public class Spawner : MonoBehaviour
 
         // Spawn object
         GameObject obj = Instantiate(cat, spawnPos, Quaternion.identity);
+        cucumberSpawner.spawnedObjects[randomCell] = obj;
 
         // Layering order
         SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();

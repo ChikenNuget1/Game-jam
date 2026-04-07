@@ -1,15 +1,29 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 
 public class CucumberSpawner : MonoBehaviour
 {
-
     public Tilemap tilemap;
     public GameObject cucumber;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
 
-    // Update is called once per frame
+    public float actionDelay = 5f;
+
+    public Dictionary<Vector3Int, GameObject> spawnedObjects = new Dictionary<Vector3Int, GameObject>();
+    Vector3Int[] directions = new Vector3Int[]
+    {
+        new Vector3Int(1, 0, 0),
+        new Vector3Int(-1, 0, 0),
+        new Vector3Int(0, 1, 0),
+        new Vector3Int(0, -1, 0),
+        /* new Vector3Int(1, 1, 0),
+        new Vector3Int(-1, 1, 0),       If we want diagonal of the cucumbers to move
+        new Vector3Int(1, -1, 0),
+        new Vector3Int(-1, -1, 0), */
+    };
+
     void Update()
     {
         if (Mouse.current.leftButton.wasPressedThisFrame)
@@ -29,9 +43,54 @@ public class CucumberSpawner : MonoBehaviour
                 GameObject obj = Instantiate(cucumber, spawnPos, Quaternion.identity);
 
                 SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+
+                StartCoroutine(DelayAction(actionDelay, cellPos));
                 if (sr != null)
                     sr.sortingOrder = -(int)(spawnPos.y * 100);
             }
         }
+    }
+
+    /// <summary>
+    ///  Function for pushing nearby cats one tile away.
+    ///  
+    /// This function pretty much checks all adjacent tiles from the cucumber and if there is a cat, then moves it one tile away
+    /// </summary>
+    /// <param name="centerCell"> The cell where the cucumber is located </param>
+    void PushNearby(Vector3Int centerCell)
+    {
+        foreach (Vector3Int dir in directions)
+        {
+            Vector3Int neighborCell = centerCell + dir;
+            // Check adjacent cells
+            if (spawnedObjects.ContainsKey(neighborCell))
+            {
+                GameObject obj = spawnedObjects[neighborCell];
+                Vector3Int targetCell = neighborCell + dir;
+
+                // If cat exists on adjacent tile
+                if (!spawnedObjects.ContainsKey(targetCell) && tilemap.HasTile(targetCell))
+                {
+                    spawnedObjects.Remove(neighborCell);
+                    spawnedObjects[targetCell] = obj;
+
+                    Vector3 newPos = tilemap.GetCellCenterWorld(targetCell);
+                    // Move one tile away
+                    obj.transform.position = newPos;
+
+                    SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+                    if (sr != null)
+                        sr.sortingOrder = -(int)(newPos.y * 100);
+                }
+            }
+        }
+    }
+
+    IEnumerator DelayAction(float delayTime, Vector3Int cellPos)
+    {
+        //Wait for the specified delay time before continuing.
+        yield return new WaitForSeconds(delayTime);
+
+        PushNearby(cellPos);
     }
 }
