@@ -11,7 +11,10 @@ public class CucumberSpawner : MonoBehaviour
 
     public float actionDelay = 5f;
 
+    // Example: At vector [0, 0, 0], there exists a Cat.
+    // [0, 0, 0] == GameObject Cat.
     public Dictionary<Vector3Int, GameObject> spawnedObjects = new Dictionary<Vector3Int, GameObject>();
+
     Vector3Int[] directions = new Vector3Int[]
     {
         new Vector3Int(1, 0, 0),
@@ -23,6 +26,10 @@ public class CucumberSpawner : MonoBehaviour
         new Vector3Int(1, -1, 0),
         new Vector3Int(-1, -1, 0), */
     };
+
+    public Tilemap goalTileMap;
+    public int score = 0;
+    public int scoreToAdd;
 
     void Update()
     {
@@ -69,8 +76,8 @@ public class CucumberSpawner : MonoBehaviour
                 GameObject obj = spawnedObjects[neighborCell];
                 Vector3Int targetCell = neighborCell + dir;
 
-                // If cat exists on adjacent tile
-                if (!spawnedObjects.ContainsKey(targetCell) && tilemap.HasTile(targetCell))
+                // If cat exists on adjacent tile && a ground tile exists || a goal tile exists
+                if (!spawnedObjects.ContainsKey(targetCell) && (tilemap.HasTile(targetCell) || goalTileMap.HasTile(targetCell)))
                 {
                     spawnedObjects.Remove(neighborCell);
                     spawnedObjects[targetCell] = obj;
@@ -79,11 +86,27 @@ public class CucumberSpawner : MonoBehaviour
                     // Move one tile away
                     obj.transform.position = newPos;
 
+                    // Check if a cat is at goal
+                    checkGoal(targetCell, obj);
+
                     SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
                     if (sr != null)
                         sr.sortingOrder = -(int)(newPos.y * 100);
                 }
             }
+        }
+    }
+
+    void checkGoal(Vector3Int targetCell, GameObject obj)
+    {
+        // Check if the goal tile has a cat on it
+        if (goalTileMap.HasTile(targetCell))
+        {
+            spawnedObjects.Remove(targetCell);
+            Destroy(obj);
+            score += scoreToAdd;
+
+            Debug.Log("Score: " + score);
         }
     }
 

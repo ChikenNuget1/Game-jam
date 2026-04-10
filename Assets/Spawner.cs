@@ -32,12 +32,6 @@ public class Spawner : MonoBehaviour
         spawn();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void spawn()
     {
         for (int i = 0; i < spawnCount; i++)
