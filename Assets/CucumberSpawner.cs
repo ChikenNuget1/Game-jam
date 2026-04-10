@@ -118,3 +118,5 @@ public class CucumberSpawner : MonoBehaviour
         PushNearby(cellPos);
     }
 }
+
+// TODO: maybe chain-cat moving? Moving a cat can other cats?
