@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class TimerManager : MonoBehaviour
 {
-    public float timeRemaining = 30f;
+    public float timeRemaining = 60f;
     public bool isRunning = true;
 
     public TextMeshProUGUI timerText;
@@ -34,7 +34,7 @@ public class TimerManager : MonoBehaviour
 
     void updateUI()
     {
-        timerText.text = "Time: " + Mathf.CeilToInt(timeRemaining);
+        timerText.text = Mathf.CeilToInt(timeRemaining).ToString();
     }
 
     void gameOver()
