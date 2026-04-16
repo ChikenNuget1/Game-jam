@@ -12,7 +12,8 @@ public class Spawner : MonoBehaviour
     // Store occupied cells
     private HashSet<Vector3Int> occupiedCells = new HashSet<Vector3Int>();
 
-    public CucumberSpawner cucumberSpawner;
+    // public CucumberSpawner cucumberSpawner;
+    public Dictionary<Vector3Int, GameObject> spawnedObjects = new Dictionary<Vector3Int, GameObject>();
 
     Vector3Int[] directions = new Vector3Int[]
 {
@@ -29,6 +30,7 @@ public class Spawner : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        spawnedObjects.Clear();
         spawn();
     }
 
@@ -62,7 +64,8 @@ public class Spawner : MonoBehaviour
 
         // Spawn object
         GameObject obj = Instantiate(cat, spawnPos, Quaternion.identity);
-        cucumberSpawner.spawnedObjects[randomCell] = obj;
+        //cucumberSpawner.spawnedObjects[randomCell] = obj;
+        spawnedObjects[randomCell] = obj;
 
         // Layering order
         SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();

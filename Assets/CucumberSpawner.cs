@@ -13,7 +13,9 @@ public class CucumberSpawner : MonoBehaviour
 
     // Example: At vector [0, 0, 0], there exists a Cat.
     // [0, 0, 0] == GameObject Cat.
-    public Dictionary<Vector3Int, GameObject> spawnedObjects = new Dictionary<Vector3Int, GameObject>();
+    // public Dictionary<Vector3Int, GameObject> spawnedObjects = new Dictionary<Vector3Int, GameObject>();    // Might need to change this so that we track spawnedObjects through the cat spawner.
+
+    public Spawner spawner;
 
     Vector3Int[] directions = new Vector3Int[]
     {
@@ -28,8 +30,9 @@ public class CucumberSpawner : MonoBehaviour
     };
 
     public Tilemap goalTileMap;
-    public int score = 0;
-    public int scoreToAdd;
+    public int scoreToAdd = 1;
+
+    public ScoreManager scoreManager;
 
     void Update()
     {
@@ -71,16 +74,16 @@ public class CucumberSpawner : MonoBehaviour
         {
             Vector3Int neighborCell = centerCell + dir;
             // Check adjacent cells
-            if (spawnedObjects.ContainsKey(neighborCell))
+            if (spawner.spawnedObjects.ContainsKey(neighborCell))
             {
-                GameObject obj = spawnedObjects[neighborCell];
+                GameObject obj = spawner.spawnedObjects[neighborCell];
                 Vector3Int targetCell = neighborCell + dir;
 
                 // If cat exists on adjacent tile && a ground tile exists || a goal tile exists
-                if (!spawnedObjects.ContainsKey(targetCell) && (tilemap.HasTile(targetCell) || goalTileMap.HasTile(targetCell)))
+                if (!spawner.spawnedObjects.ContainsKey(targetCell) && (tilemap.HasTile(targetCell) || goalTileMap.HasTile(targetCell)))
                 {
-                    spawnedObjects.Remove(neighborCell);
-                    spawnedObjects[targetCell] = obj;
+                    spawner.spawnedObjects.Remove(neighborCell);
+                    spawner.spawnedObjects[targetCell] = obj;
 
                     Vector3 newPos = tilemap.GetCellCenterWorld(targetCell);
                     // Move one tile away
@@ -102,11 +105,9 @@ public class CucumberSpawner : MonoBehaviour
         // Check if the goal tile has a cat on it
         if (goalTileMap.HasTile(targetCell))
         {
-            spawnedObjects.Remove(targetCell);
+            spawner.spawnedObjects.Remove(targetCell);
             Destroy(obj);
-            score += scoreToAdd;
-
-            Debug.Log("Score: " + score);
+            scoreManager.addScore(scoreToAdd);
         }
     }
 
