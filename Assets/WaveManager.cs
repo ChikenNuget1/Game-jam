@@ -10,7 +10,7 @@ public class WaveManager : MonoBehaviour
 
     bool waveInProgress = true;
 
-    // Update is called once per frame
+    // Check if wave is in progress or the wave is complete.
     void Update()
     {
         if (waveInProgress && isWaveComplete())
@@ -20,6 +20,7 @@ public class WaveManager : MonoBehaviour
         }
     }
 
+    // Check if wave is cocmplete
     bool isWaveComplete()
     {
         var objects = spawner.spawnedObjects;
@@ -28,6 +29,7 @@ public class WaveManager : MonoBehaviour
         {
             return true;
         }
+        // For each cat, check if they are still able to be moved
         foreach (var obj in objects)
         {
             Vector3Int cell = obj.Key;
@@ -40,6 +42,7 @@ public class WaveManager : MonoBehaviour
         return true;
     }
 
+    // Check if cats can move
     bool canMove(Vector3Int cell)
     {
         Vector3Int[] directions = new Vector3Int[]
@@ -50,10 +53,11 @@ public class WaveManager : MonoBehaviour
         new Vector3Int(0, -1, 0),
         };
 
+        // For each direction vertex, check if a cat can move / if a cucumber can be placed.
         foreach (var dir in directions)
         {
-            Vector3Int cucumberCell = cell - dir; // where cucumber would go
-            Vector3Int targetCell = cell + dir;   // where cat would be pushed
+            Vector3Int cucumberCell = cell - dir; // Check cucumber placement
+            Vector3Int targetCell = cell + dir;   // Check cat movement
 
             if (tilemap.HasTile(cucumberCell) &&     // can place cucumber
                 tilemap.HasTile(targetCell) &&       // destination exists
@@ -66,6 +70,7 @@ public class WaveManager : MonoBehaviour
         return false;
     }
 
+    // Initialise new wave
     void nextWave()
     {
         waveNumber++;
@@ -75,6 +80,7 @@ public class WaveManager : MonoBehaviour
         waveInProgress = true;
     }
 
+    // Clear all cats off the map
     void clearAllCats()
     {
         foreach (var obj in spawner.spawnedObjects.Values)
