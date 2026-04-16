@@ -10,6 +10,9 @@ public class WaveManager : MonoBehaviour
 
     bool waveInProgress = true;
 
+    public TimerManager timerManager;
+    public float timeBonus = 5f;
+
     // Check if wave is in progress or the wave is complete.
     void Update()
     {
@@ -76,6 +79,7 @@ public class WaveManager : MonoBehaviour
         waveNumber++;
         clearAllCats();
         spawnNewWave();
+        timerManager.addTime(waveNumber);
 
         waveInProgress = true;
     }
