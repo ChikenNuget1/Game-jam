@@ -9,6 +9,9 @@ public class CucumberSpawner : MonoBehaviour
     public Tilemap tilemap;
     public GameObject cucumber;
 
+    [Header("Circle Indicator")]
+    public GameObject circleIndicatorPrefab;
+
     public float actionDelay = 5f;
 
     // Example: At vector [0, 0, 0], there exists a Cat.
@@ -102,12 +105,30 @@ public class CucumberSpawner : MonoBehaviour
 
     void checkGoal(Vector3Int targetCell, GameObject obj)
     {
-        // Check if the goal tile has a cat on it
         if (goalTileMap.HasTile(targetCell))
         {
+            // Don't destroy immediately — spawn the indicator
             spawner.spawnedObjects.Remove(targetCell);
-            Destroy(obj);
-            scoreManager.addScore(scoreToAdd);
+
+            GameObject indicator = Instantiate(circleIndicatorPrefab, obj.transform.position, Quaternion.identity);
+            indicator.transform.SetParent(obj.transform); // follow the cat
+
+            CircleIndicator ci = indicator.GetComponent<CircleIndicator>();
+            ci.Initialize(
+                // Success: player clicked at the right time
+                () =>
+                {
+                    Debug.Log("Perfect! Cat caught!");
+                    scoreManager.addScore(scoreToAdd);
+                    Destroy(obj);
+                },
+                // Fail: cat escapes — put it back or just leave it
+                () =>
+                {
+                    Debug.Log("Missed! Cat escaped.");
+                    Destroy(obj);
+                }
+            );
         }
     }
 
