@@ -1,5 +1,7 @@
+using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
@@ -116,8 +118,116 @@ public class CucumberSpawner : MonoBehaviour
         //Wait for the specified delay time before continuing.
         yield return new WaitForSeconds(delayTime);
 
-        PushNearby(cellPos);
+        foreach (var dir in directions)
+        {
+            Vector3Int neighbor = cellPos + dir;
+            
+            if (spawner.spawnedObjects.ContainsKey(neighbor))
+            {
+                PushChain(neighbor, dir);
+            }
+        }
+        // PushNearby(cellPos);
+    }
+    HashSet<Vector3Int> GetConnectedCats(Vector3Int startcell)
+    {
+        Queue<Vector3Int> queue = new Queue<Vector3Int>();
+        HashSet<Vector3Int> visited = new HashSet<Vector3Int>();
+
+        queue.Enqueue(startcell);
+        visited.Add(startcell);
+
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            foreach (var dir in directions)
+            {
+                var neighbor = current + dir;
+
+                if (spawner.spawnedObjects.ContainsKey(neighbor) && !visited.Contains(neighbor))
+                {
+                    visited.Add(neighbor);
+                    queue.Enqueue(neighbor);
+                }
+            }
+        }
+        return visited;
+    }
+
+    void PushChain(Vector3Int startcell, Vector3Int dir)
+    {
+        var connected = GetConnectedCats(startcell);
+
+        List<Vector3Int> sorted = new List<Vector3Int>(connected);
+        sorted.Sort((a, b) => Dot(b, dir).CompareTo(Dot(a, dir)));
+        HashSet<Vector3Int> occupied = new HashSet<Vector3Int>(spawner.spawnedObjects.Keys);
+
+        List<Vector3Int> toRemove = new List<Vector3Int>();
+        List<(Vector3Int oldCell, GameObject obj, Vector3 newPos, Vector3Int newCell)> moves = new List<(Vector3Int, GameObject, Vector3, Vector3Int)>();
+
+        foreach (var cell in connected)
+        {
+            occupied.Remove(cell);
+        }
+
+        foreach (var cell in sorted)
+        {
+            Vector3Int target = cell + dir;
+
+            if (goalTileMap.HasTile(target))
+            {
+                toRemove.Add(cell);
+                continue;
+            }
+
+            if (!tilemap.HasTile(target) || occupied.Contains(target))
+            {
+                continue;
+            }
+
+            GameObject obj = spawner.spawnedObjects[cell];
+            Vector3 newPos = tilemap.GetCellCenterWorld(target);
+
+            moves.Add((cell, obj, newPos, target));
+        }
+
+        foreach (var move in moves)
+        {
+            spawner.spawnedObjects.Remove(move.oldCell);
+        }
+
+        foreach (var move in moves)
+        {
+            move.obj.transform.position = move.newPos;
+            spawner.spawnedObjects[move.newCell] = move.obj;
+        }
+
+        HandleCombo(toRemove);
+    }
+
+    void HandleCombo(List<Vector3Int> removedCells)
+    {
+        int comboCount = removedCells.Count;
+
+        if (comboCount == 0) return;
+
+        int baseScore = 1;
+        int totalScore = baseScore * comboCount * comboCount;
+
+        foreach (var cell in removedCells)
+        {
+            GameObject obj = spawner.spawnedObjects[cell];
+            Destroy(obj);
+            spawner.spawnedObjects.Remove(cell);
+        }
+
+        scoreManager.addScore(totalScore);
+
+        Debug.Log("Combo x" + comboCount + " Score: " + totalScore);
+    }
+
+    int Dot(Vector3Int lhs, Vector3Int rhs)
+    {
+        return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
     }
 }
-
-// TODO: maybe chain-cat moving? Moving a cat can other cats?
