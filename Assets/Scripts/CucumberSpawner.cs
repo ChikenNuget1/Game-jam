@@ -38,6 +38,7 @@ public class CucumberSpawner : MonoBehaviour
 
     void Update()
     {
+        // MAIN CLICK LOGIC
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             Vector3 mouseScreen = Mouse.current.position.ReadValue();
@@ -57,6 +58,7 @@ public class CucumberSpawner : MonoBehaviour
 
                 SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
 
+                // Add delay before moving cats
                 StartCoroutine(DelayAction(actionDelay, cellPos));
                 if (sr != null)
                     sr.sortingOrder = -(int)(spawnPos.y * 100);
@@ -129,23 +131,39 @@ public class CucumberSpawner : MonoBehaviour
         }
         // PushNearby(cellPos);
     }
+
+    /// <summary>
+    /// Function that returns all cats that are next to other cats.
+    /// </summary>
+    /// <param name="startcell"> Cell where cucumber is placed </param>
+    /// <returns> A hashset containing cats that are connected to each other </returns>
     HashSet<Vector3Int> GetConnectedCats(Vector3Int startcell)
     {
+        // Cats to visit
         Queue<Vector3Int> queue = new Queue<Vector3Int>();
+        
+        // Cats that have been visited
         HashSet<Vector3Int> visited = new HashSet<Vector3Int>();
 
         queue.Enqueue(startcell);
         visited.Add(startcell);
 
+        // While queue exists
         while (queue.Count > 0)
         {
             var current = queue.Dequeue();
+
+            // For each cat within 1 block of the cucumber
+            // Check for other cats within 1 block of those cats
+            // Iteratively check until no cats nearby
             foreach (var dir in directions)
             {
                 var neighbor = current + dir;
 
+                // If cats are next to each other
                 if (spawner.spawnedObjects.ContainsKey(neighbor) && !visited.Contains(neighbor))
                 {
+                    // Add them to the visited list
                     visited.Add(neighbor);
                     queue.Enqueue(neighbor);
                 }
@@ -154,17 +172,24 @@ public class CucumberSpawner : MonoBehaviour
         return visited;
     }
 
+    /// <summary>
+    /// Pushes all cats that are next to each other OR facing each other.
+    /// </summary>
+    /// <param name="startcell"> Cell where cucumber is placed </param>
+    /// <param name="dir"> Direction </param>
     void PushChain(Vector3Int startcell, Vector3Int dir)
     {
         var connected = GetConnectedCats(startcell);
 
         List<Vector3Int> sorted = new List<Vector3Int>(connected);
         sorted.Sort((a, b) => Dot(b, dir).CompareTo(Dot(a, dir)));
+
         HashSet<Vector3Int> occupied = new HashSet<Vector3Int>(spawner.spawnedObjects.Keys);
 
         List<Vector3Int> toRemove = new List<Vector3Int>();
         List<(Vector3Int oldCell, GameObject obj, Vector3 newPos, Vector3Int newCell)> moves = new List<(Vector3Int, GameObject, Vector3, Vector3Int)>();
 
+        // Remove cells that are moving
         foreach (var cell in connected)
         {
             occupied.Remove(cell);
@@ -211,8 +236,8 @@ public class CucumberSpawner : MonoBehaviour
 
         if (comboCount == 0) return;
 
-        int baseScore = 1;
-        int totalScore = baseScore * comboCount * comboCount;
+        // Exponential score modifer
+        int totalScore = scoreToAdd * comboCount * comboCount;
 
         foreach (var cell in removedCells)
         {
