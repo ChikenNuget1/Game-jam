@@ -21,9 +21,9 @@ public class CucumberSpawner : MonoBehaviour
 
     Vector3Int[] directions = new Vector3Int[]
     {
-        new Vector3Int(1, 0, 0),
+        new Vector3Int(1, 0, 0), // x
         new Vector3Int(-1, 0, 0),
-        new Vector3Int(0, 1, 0),
+        new Vector3Int(0, 1, 0), // y
         new Vector3Int(0, -1, 0),
         /* new Vector3Int(1, 1, 0),
         new Vector3Int(-1, 1, 0),       If we want diagonal of the cucumbers to move
