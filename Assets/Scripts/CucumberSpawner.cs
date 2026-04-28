@@ -1,4 +1,4 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
@@ -148,6 +148,18 @@ public class CucumberSpawner : MonoBehaviour
         queue.Enqueue(startcell);
         visited.Add(startcell);
 
+        Vector3Int[] xDirections = new Vector3Int[]
+        {
+            new Vector3Int(1, 0, 0), // x
+            new Vector3Int(-1, 0, 0),
+            // new Vector3Int(0, 1, 0), // y
+            // new Vector3Int(0, -1, 0),
+            /* new Vector3Int(1, 1, 0),
+            new Vector3Int(-1, 1, 0),       If we want diagonal of the cucumbers to move
+            new Vector3Int(1, -1, 0),
+            new Vector3Int(-1, -1, 0), */
+        };
+
         // While queue exists
         while (queue.Count > 0)
         {
@@ -156,7 +168,7 @@ public class CucumberSpawner : MonoBehaviour
             // For each cat within 1 block of the cucumber
             // Check for other cats within 1 block of those cats
             // Iteratively check until no cats nearby
-            foreach (var dir in directions)
+            foreach (var dir in xDirections)
             {
                 var neighbor = current + dir;
 
