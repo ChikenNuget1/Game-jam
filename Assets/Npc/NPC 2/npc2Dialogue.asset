@@ -14,12 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPCDialogue
   npcName: Lucas
   npcPortrait: {fileID: 0}
-  dialogueLines:
-  - HI ITS LUCAS
-  - I AM LUCAS
-  - 'I AM AN NPC I AM AN NPC I AM AN NPC I AM AN NPC  '
-  autoProgressLines: 000000
   autoProgressDelay: 1.5
   typingSpeed: 0.05
   voiceSound: {fileID: 0}
   voicePitch: 1
+  introLines:
+  - intro dialogue
+  introAutoProgress: 
+  hasQuest: 1
+  questActiveLines:
+  - i also have a quest for you
+  - go do my quest
+  - i will give u a rod
+  questActiveAutoProgress: 
+  questCompleteLines:
+  - thank u for doing the quest
+  - here is your rod
+  questCompleteAutoProgress: 
+  postQuestLines:
+  - i'm done talking to you
+  postQuestAutoProgress: 

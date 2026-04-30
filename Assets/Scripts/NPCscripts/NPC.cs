@@ -70,7 +70,9 @@ public class NPC : MonoBehaviour, IInteractable
         {
             questState.introSeen = true;
             SaveState();
-            return dialogueData.introLines;
+            return dialogueData.hasQuest
+                ? CombineLines(dialogueData.introLines, dialogueData.questActiveLines)
+                : dialogueData.introLines;
         }
 
         if (dialogueData.hasQuest)
