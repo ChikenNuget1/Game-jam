@@ -236,8 +236,8 @@ public class CucumberSpawner : MonoBehaviour
 
         foreach (var move in moves)
         {
-            move.obj.transform.position = move.newPos;
             spawner.spawnedObjects[move.newCell] = move.obj;
+            StartCoroutine(MoveSmooth(move.obj, move.newPos));
         }
 
         HandleCombo(toRemove);
@@ -279,5 +279,19 @@ public class CucumberSpawner : MonoBehaviour
     int Dot(Vector3Int lhs, Vector3Int rhs)
     {
         return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+    }
+
+    IEnumerator MoveSmooth(GameObject obj, Vector3 target)
+    {
+        Vector3 start = obj.transform.position;
+        float t = 0;
+        float duration = 0.2f;
+
+        while (t < 1)
+        {
+            t += Time.deltaTime / duration;
+            obj.transform.position = Vector3.Lerp(start, target, t);
+            yield return null;
+        }
     }
 }
