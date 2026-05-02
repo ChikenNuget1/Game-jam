@@ -355,8 +355,7 @@ public class CucumberSpawner : MonoBehaviour
         StartCoroutine(comboUI.ShowCombo(comboCount));
 
         float shakeAmount = totalScore / comboCount;
-
-        if (comboCount < 3)
+        if (comboCount <= 3)
         {
             shakeAmount = shakeAmount / 2;
         }
