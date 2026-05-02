@@ -10,6 +10,7 @@ public class CucumberSpawner : MonoBehaviour
 {
     public Tilemap tilemap;
     public GameObject cucumber;
+    public ShakeCamera cameraShake;
 
     public float actionDelay = 5f;
 
@@ -251,12 +252,24 @@ public class CucumberSpawner : MonoBehaviour
         // Exponential score modifer
         int totalScore = scoreToAdd * comboCount * comboCount;
 
-        foreach (var cell in removedCells)
+        float shakeAmount = totalScore / comboCount;
+
+        if (comboCount < 3)
         {
-            GameObject obj = spawner.spawnedObjects[cell];
-            Destroy(obj);
-            spawner.spawnedObjects.Remove(cell);
+            shakeAmount = shakeAmount / 2;
         }
+        else
+        {
+            shakeAmount = shakeAmount / 2.5f;
+        }
+
+            foreach (var cell in removedCells)
+            {
+                GameObject obj = spawner.spawnedObjects[cell];
+                Destroy(obj);
+                spawner.spawnedObjects.Remove(cell);
+                StartCoroutine(cameraShake.Shake(shakeAmount, 0.01f));
+            }
 
         scoreManager.addScore(totalScore);
 
