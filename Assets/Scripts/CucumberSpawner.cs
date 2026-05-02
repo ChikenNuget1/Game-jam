@@ -263,15 +263,19 @@ public class CucumberSpawner : MonoBehaviour
         }
         else
         {
-            shakeAmount = shakeAmount / 2.5f;
+            shakeAmount = shakeAmount / 3f;
+        }
+        if (comboCount >= 2)
+        {
+            StartCoroutine(cameraShake.Shake(shakeAmount, 0.01f * comboCount));
         }
 
-            foreach (var cell in removedCells)
+        foreach (var cell in removedCells)
             {
                 GameObject obj = spawner.spawnedObjects[cell];
                 Destroy(obj);
                 spawner.spawnedObjects.Remove(cell);
-                StartCoroutine(cameraShake.Shake(shakeAmount, 0.01f));
+                // StartCoroutine(cameraShake.Shake(shakeAmount, 0.01f));
             }
 
         scoreManager.addScore(totalScore);

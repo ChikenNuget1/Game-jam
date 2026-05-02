@@ -35,7 +35,11 @@ public class ComboUI : MonoBehaviour
         while (t < 1f)
         {
             t += Time.deltaTime / duration;
-            float scale = Mathf.Lerp(0.5f, 1.5f, t);
+            
+            // Text Size
+            float maxScale = 1.5f + comboCount * 0.2f;
+            float scale = Mathf.Lerp(0.5f, maxScale, t);
+            
             comboText.transform.localScale = Vector3.one * scale;
 
             comboText.alpha = Mathf.Lerp(1f, 0f, t);
