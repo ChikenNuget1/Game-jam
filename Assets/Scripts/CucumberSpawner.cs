@@ -11,6 +11,7 @@ public class CucumberSpawner : MonoBehaviour
     public Tilemap tilemap;
     public GameObject cucumber;
     public ShakeCamera cameraShake;
+    public ComboUI comboUI;
 
     public float actionDelay = 5f;
 
@@ -251,6 +252,8 @@ public class CucumberSpawner : MonoBehaviour
 
         // Exponential score modifer
         int totalScore = scoreToAdd * comboCount * comboCount;
+
+        StartCoroutine(comboUI.ShowCombo(totalScore));
 
         float shakeAmount = totalScore / comboCount;
 
