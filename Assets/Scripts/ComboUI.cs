@@ -8,7 +8,23 @@ public class ComboUI : MonoBehaviour
 
     public IEnumerator ShowCombo (int comboCount)
     {
-        comboText.text = "+" + comboCount + "!";
+        if (comboCount == 1) yield break;
+
+        // Colour change based on score
+        if (comboCount >= 5)
+        {
+            comboText.color = Color.purple;
+        } else if (comboCount >= 3)
+        {
+            comboText.color = Color.red;
+        }
+        else
+        {
+            comboText.color = Color.white;
+        }
+
+        int totalScore = comboCount * comboCount;
+        comboText.text = "+" + totalScore + "!";
 
         comboText.alpha = 1f;
         comboText.transform.localScale = Vector3.one * 0.5f;

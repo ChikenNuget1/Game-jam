@@ -253,7 +253,7 @@ public class CucumberSpawner : MonoBehaviour
         // Exponential score modifer
         int totalScore = scoreToAdd * comboCount * comboCount;
 
-        StartCoroutine(comboUI.ShowCombo(totalScore));
+        StartCoroutine(comboUI.ShowCombo(comboCount));
 
         float shakeAmount = totalScore / comboCount;
 
