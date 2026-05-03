@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14953b16fad86ed4688ec2e07629abe2, type: 3}
+  m_Name: reach_wave_5
+  m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
+  questID: 
+  questTitle: 
+  questDescription: Reach wave 5
+  questType: 0
+  targetWave: 5
+  targetScore: 0
