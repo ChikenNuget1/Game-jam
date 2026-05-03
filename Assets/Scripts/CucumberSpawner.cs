@@ -365,7 +365,7 @@ public class CucumberSpawner : MonoBehaviour
         }
         if (comboCount >= 2)
         {
-            StartCoroutine(cameraShake.Shake(shakeAmount, 0.01f * comboCount));
+            StartCoroutine(cameraShake.Shake(shakeAmount, 0.01f));
         }
 
         foreach (var cell in removedCells)
