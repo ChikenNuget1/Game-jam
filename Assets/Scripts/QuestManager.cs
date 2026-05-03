@@ -2,16 +2,6 @@
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
-/// <summary>
-/// Singleton that tracks the current active quest and completion state.
-/// Supports BeatWave and ReachScore quest types.
-/// Persists via DontDestroyOnLoad.
-///
-/// SETUP:
-///   - Attach to a GameObject in your first loaded scene.
-///   - Create QuestDefinition assets and assign them to the quest NPC's questPool.
-///   - Set hubSceneName to "HubArea".
-/// </summary>
 public class QuestManager : MonoBehaviour
 {
     public static QuestManager Instance { get; private set; }
@@ -23,10 +13,8 @@ public class QuestManager : MonoBehaviour
     public QuestDefinition activeQuest { get; private set; }
     public bool questComplete { get; private set; } = false;
 
-    // NPC to notify when quest completes
     private HashSet<string> pendingNPCCompletions = new HashSet<string>();
 
-    // ── Fishing unlock (kept from before) ─────────────────────
     public bool fishingMap2Unlocked { get; private set; } = false;
 
     void Awake()
@@ -42,7 +30,7 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    // ── Called by NPC when a quest is randomly assigned ────────
+    // ── Called by NPC ──────────────────────────────────────────
 
     public void StartQuest(QuestDefinition quest)
     {
@@ -62,7 +50,7 @@ public class QuestManager : MonoBehaviour
             CompleteActiveQuest();
     }
 
-    // ── Called by ScoreManager when score changes ──────────────
+    // ── Called by ScoreManager ─────────────────────────────────
 
     public void OnScoreChanged(int currentScore)
     {
@@ -83,6 +71,10 @@ public class QuestManager : MonoBehaviour
         Debug.Log($"[QuestManager] Quest complete: {activeQuest.questTitle}");
 
         pendingNPCCompletions.Add("quest_npc_main");
+
+        // Clear active quest so NPC assigns a fresh random one next visit
+        activeQuest = null;
+
         SceneManager.LoadScene(hubSceneName);
     }
 
@@ -99,10 +91,6 @@ public class QuestManager : MonoBehaviour
 
     public bool HasActiveQuest() => activeQuest != null;
 
-    /// <summary>
-    /// Returns a description of the current quest for use in NPC dialogue.
-    /// e.g. "Herd 3 waves of cats!"
-    /// </summary>
     public string GetActiveQuestDescription()
     {
         if (activeQuest == null) return "";
