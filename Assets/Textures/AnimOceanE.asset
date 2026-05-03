@@ -12,7 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13b75c95f34a00d4e8c04f76b73312e6, type: 3}
   m_Name: AnimOceanE
   m_EditorClassIdentifier: Unity.2D.Tilemap.Extras::UnityEngine.Tilemaps.AnimatedTile
-  m_AnimatedSprites: []
+  m_AnimatedSprites:
+  - {fileID: 2388814506351797570, guid: f8fd57e760022fb4c9e1ffbcaa50aa8e, type: 3}
+  - {fileID: -2049651818, guid: f8fd57e760022fb4c9e1ffbcaa50aa8e, type: 3}
+  - {fileID: -2065777654, guid: f8fd57e760022fb4c9e1ffbcaa50aa8e, type: 3}
+  - {fileID: 1222600377, guid: f8fd57e760022fb4c9e1ffbcaa50aa8e, type: 3}
+  - {fileID: -1570791210, guid: f8fd57e760022fb4c9e1ffbcaa50aa8e, type: 3}
+  - {fileID: -478772149, guid: f8fd57e760022fb4c9e1ffbcaa50aa8e, type: 3}
+  - {fileID: 1713122160, guid: f8fd57e760022fb4c9e1ffbcaa50aa8e, type: 3}
+  - {fileID: 643190045, guid: f8fd57e760022fb4c9e1ffbcaa50aa8e, type: 3}
   m_MinSpeed: 1
   m_MaxSpeed: 1
   m_AnimationStartTime: 0
