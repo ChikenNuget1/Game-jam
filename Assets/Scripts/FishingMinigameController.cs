@@ -77,10 +77,6 @@ public class FishingMinigameController : MonoBehaviour
             Rigidbody2D rb = activeHook.GetComponent<Rigidbody2D>();
             if (rb.bodyType == RigidbodyType2D.Static)
             {
-                // ── QUEST HOOK ──────────────────────────────────────────
-                if (QuestManager.Instance != null)
-                    QuestManager.Instance.CompleteQuest(QuestManager.QUEST_CATCH_FISH);
-                // ────────────────────────────────────────────────────────
 
                 yield return new WaitForSeconds(3f);
                 StartCoroutine(FadeAndLoad());

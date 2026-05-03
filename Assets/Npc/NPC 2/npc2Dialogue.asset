@@ -23,13 +23,12 @@ MonoBehaviour:
   introAutoProgress: 
   hasQuest: 1
   questActiveLines:
-  - i also have a quest for you
-  - go do my quest
-  - i will give u a rod
+  - Your task, should you choose to accept it is to
+  - '{quest}'
+  - Go do it right now !!!
   questActiveAutoProgress: 
   questCompleteLines:
-  - thank u for doing the quest
-  - here is your rod
+  - Thank you for doing the quest
   questCompleteAutoProgress: 
   postQuestLines:
   - i'm done talking to you

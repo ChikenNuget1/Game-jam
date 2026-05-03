@@ -4,9 +4,14 @@ using TMPro;
 using UnityEngine.UI;
 
 /// <summary>
-/// NPC — same as original with one addition:
-///   • questIDToStart field in Inspector
-///   • When intro dialogue is seen for the first time, starts that quest in QuestManager
+/// NPC — supports dynamic quest descriptions injected into dialogue.
+/// In your NPCDialogue asset, use {quest} anywhere in questActiveLines
+/// and it will be replaced with the active quest's description at runtime.
+///
+/// Example questActiveLines entry:
+///   "I need your help! {quest} Can you do it?"
+/// Becomes at runtime:
+///   "I need your help! Herd 3 waves of cats! Can you do it?"
 /// </summary>
 public class NPC : MonoBehaviour, IInteractable
 {
@@ -14,11 +19,8 @@ public class NPC : MonoBehaviour, IInteractable
     public NPCDialogue dialogueData;
     public string npcID;
 
-    [Header("Quest")]
-    // Set this to the quest ID this NPC should start when intro is first seen.
-    // Leave blank if this NPC doesn't start a quest.
-    // Example: "quest_beat_wave"
-    public string questIDToStart;
+    [Header("Quest Pool")]
+    public QuestDefinition[] questPool;
 
     [Header("UI")]
     public GameObject dialoguePanel;
@@ -77,62 +79,89 @@ public class NPC : MonoBehaviour, IInteractable
 
     string[] GetCurrentLines()
     {
-        if (!questState.introSeen)
+        // Quest just completed — show completion dialogue
+        if (questState.questComplete && !questState.completionSeen)
+            return dialogueData.questCompleteLines;
+
+        // No active quest — pick a random one and start it
+        if (!QuestManager.Instance.HasActiveQuest())
         {
-            questState.introSeen = true;
-            SaveState();
+            AssignRandomQuest();
 
-            // ── QUEST START HOOK ────────────────────────────────────
-            // Start the quest the first time the player talks to this NPC
-            if (!string.IsNullOrEmpty(questIDToStart) && QuestManager.Instance != null)
-                QuestManager.Instance.StartQuest(questIDToStart);
-            // ────────────────────────────────────────────────────────
+            if (!questState.introSeen)
+            {
+                questState.introSeen = true;
+                SaveState();
+                return InjectQuestDescription(CombineLines(dialogueData.introLines, dialogueData.questActiveLines));
+            }
 
-            return dialogueData.hasQuest
-                ? CombineLines(dialogueData.introLines, dialogueData.questActiveLines)
-                : dialogueData.introLines;
+            return InjectQuestDescription(dialogueData.questActiveLines);
         }
 
-        if (dialogueData.hasQuest)
-        {
-            if (questState.questComplete && !questState.completionSeen)
-                return dialogueData.questCompleteLines;
+        // Quest active — show active lines with description injected
+        return InjectQuestDescription(dialogueData.questActiveLines);
+    }
 
-            if (!questState.questComplete)
-                return dialogueData.questActiveLines;
+    /// <summary>
+    /// Replaces {quest} in any dialogue line with the active quest's description.
+    /// Also replaces {target} with the numeric target (wave number or score).
+    /// </summary>
+    string[] InjectQuestDescription(string[] lines)
+    {
+        if (QuestManager.Instance == null || !QuestManager.Instance.HasActiveQuest())
+            return lines;
+
+        QuestDefinition quest = QuestManager.Instance.activeQuest;
+
+        string questDesc = quest.questDescription;
+        string target = quest.questType == QuestType.BeatWave
+            ? quest.targetWave.ToString()
+            : quest.targetScore.ToString();
+
+        string[] injected = new string[lines.Length];
+        for (int i = 0; i < lines.Length; i++)
+        {
+            injected[i] = lines[i]
+                .Replace("{quest}", questDesc)
+                .Replace("{target}", target);
+        }
+        return injected;
+    }
+
+    void AssignRandomQuest()
+    {
+        if (questPool == null || questPool.Length == 0)
+        {
+            Debug.LogWarning($"[NPC] {npcID} has no quests in questPool!");
+            return;
         }
 
-        return dialogueData.postQuestLines;
+        int index = Random.Range(0, questPool.Length);
+        QuestDefinition chosen = questPool[index];
+
+        QuestManager.Instance.StartQuest(chosen);
+
+        questState.questComplete = false;
+        questState.completionSeen = false;
+        SaveState();
+
+        Debug.Log($"[NPC] Assigned quest: {chosen.questTitle}");
     }
 
     bool[] GetCurrentAutoProgress()
     {
+        if (questState.questComplete && !questState.completionSeen)
+            return dialogueData.questCompleteAutoProgress;
+
         if (!questState.introSeen)
             return dialogueData.introAutoProgress;
 
-        if (dialogueData.hasQuest)
-        {
-            if (questState.questComplete && !questState.completionSeen)
-                return dialogueData.questCompleteAutoProgress;
-
-            if (!questState.questComplete)
-                return dialogueData.questActiveAutoProgress;
-        }
-
-        return dialogueData.postQuestAutoProgress;
+        return dialogueData.questActiveAutoProgress;
     }
 
     string[] CombineLines(string[] a, string[] b)
     {
         string[] combined = new string[a.Length + b.Length];
-        a.CopyTo(combined, 0);
-        b.CopyTo(combined, a.Length);
-        return combined;
-    }
-
-    bool[] CombineAutoProgress(bool[] a, bool[] b)
-    {
-        bool[] combined = new bool[a.Length + b.Length];
         a.CopyTo(combined, 0);
         b.CopyTo(combined, a.Length);
         return combined;
@@ -188,7 +217,7 @@ public class NPC : MonoBehaviour, IInteractable
     {
         StopAllCoroutines();
 
-        if (dialogueData.hasQuest && questState.questComplete && !questState.completionSeen)
+        if (questState.questComplete && !questState.completionSeen)
         {
             questState.completionSeen = true;
             SaveState();

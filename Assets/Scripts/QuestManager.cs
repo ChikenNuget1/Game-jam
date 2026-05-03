@@ -3,35 +3,31 @@ using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
 /// <summary>
-/// Singleton that tracks quest progress and unlocks across all scenes.
+/// Singleton that tracks the current active quest and completion state.
+/// Supports BeatWave and ReachScore quest types.
 /// Persists via DontDestroyOnLoad.
 ///
 /// SETUP:
-///   - Create an empty GameObject in your first loaded scene, attach this.
-///   - Set targetWave in the Inspector.
-///   - On your quest NPC, set npcID to "quest_npc_main".
+///   - Attach to a GameObject in your first loaded scene.
+///   - Create QuestDefinition assets and assign them to the quest NPC's questPool.
+///   - Set hubSceneName to "HubArea".
 /// </summary>
 public class QuestManager : MonoBehaviour
 {
     public static QuestManager Instance { get; private set; }
 
-    // ── Quest ID constants ─────────────────────────────────────
-    public const string QUEST_CATCH_FISH = "quest_catch_fish";
-    public const string QUEST_BEAT_WAVE = "quest_beat_wave";
-    public const string QUEST_UNLOCK_MAP2 = "quest_unlock_map2";
-
-    // ── State ──────────────────────────────────────────────────
-    private HashSet<string> activeQuests = new HashSet<string>();
-    private HashSet<string> completedQuests = new HashSet<string>();
-    private HashSet<string> pendingNPCCompletions = new HashSet<string>();
-
-    public bool fishingMap2Unlocked { get; private set; } = false;
-
-    [Header("Wave Quest Settings")]
-    public int targetWave = 3;
-
     [Header("Scene Names")]
     public string hubSceneName = "HubArea";
+
+    // ── Active quest state ─────────────────────────────────────
+    public QuestDefinition activeQuest { get; private set; }
+    public bool questComplete { get; private set; } = false;
+
+    // NPC to notify when quest completes
+    private HashSet<string> pendingNPCCompletions = new HashSet<string>();
+
+    // ── Fishing unlock (kept from before) ─────────────────────
+    public bool fishingMap2Unlocked { get; private set; } = false;
 
     void Awake()
     {
@@ -46,45 +42,51 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    // ── Public API ─────────────────────────────────────────────
+    // ── Called by NPC when a quest is randomly assigned ────────
 
-    public void StartQuest(string questID)
+    public void StartQuest(QuestDefinition quest)
     {
-        if (!completedQuests.Contains(questID))
-            activeQuests.Add(questID);
-    }
-
-    public bool IsQuestActive(string questID) => activeQuests.Contains(questID);
-    public bool IsQuestComplete(string questID) => completedQuests.Contains(questID);
-
-    public void CompleteQuest(string questID)
-    {
-        if (completedQuests.Contains(questID)) return;
-
-        activeQuests.Remove(questID);
-        completedQuests.Add(questID);
-
-        Debug.Log($"[QuestManager] Quest completed: {questID}");
-        HandleQuestCompletion(questID);
+        activeQuest = quest;
+        questComplete = false;
+        Debug.Log($"[QuestManager] Quest started: {quest.questTitle}");
     }
 
     // ── Called by WaveManager ──────────────────────────────────
 
     public void OnWaveCompleted(int waveNumber)
     {
-        if (!IsQuestComplete(QUEST_BEAT_WAVE) && waveNumber >= targetWave)
-        {
-            CompleteQuest(QUEST_BEAT_WAVE);
+        if (activeQuest == null || questComplete) return;
+        if (activeQuest.questType != QuestType.BeatWave) return;
 
-            // Queue NPC update for when hub loads
-            pendingNPCCompletions.Add("quest_npc_main");
-
-            // Immediately return to hub
-            SceneManager.LoadScene(hubSceneName);
-        }
+        if (waveNumber >= activeQuest.targetWave)
+            CompleteActiveQuest();
     }
 
-    // ── Called by HubQuestBridge on hub scene load ─────────────
+    // ── Called by ScoreManager when score changes ──────────────
+
+    public void OnScoreChanged(int currentScore)
+    {
+        if (activeQuest == null || questComplete) return;
+        if (activeQuest.questType != QuestType.ReachScore) return;
+
+        if (currentScore >= activeQuest.targetScore)
+            CompleteActiveQuest();
+    }
+
+    // ── Internal completion ────────────────────────────────────
+
+    void CompleteActiveQuest()
+    {
+        questComplete = true;
+        fishingMap2Unlocked = true;
+
+        Debug.Log($"[QuestManager] Quest complete: {activeQuest.questTitle}");
+
+        pendingNPCCompletions.Add("quest_npc_main");
+        SceneManager.LoadScene(hubSceneName);
+    }
+
+    // ── Called by HubQuestBridge ───────────────────────────────
 
     public HashSet<string> GetAndClearPendingNPCCompletions()
     {
@@ -93,23 +95,17 @@ public class QuestManager : MonoBehaviour
         return pending;
     }
 
-    // ── Side effects ───────────────────────────────────────────
+    // ── Helpers ────────────────────────────────────────────────
 
-    void HandleQuestCompletion(string questID)
+    public bool HasActiveQuest() => activeQuest != null;
+
+    /// <summary>
+    /// Returns a description of the current quest for use in NPC dialogue.
+    /// e.g. "Herd 3 waves of cats!"
+    /// </summary>
+    public string GetActiveQuestDescription()
     {
-        switch (questID)
-        {
-            case QUEST_BEAT_WAVE:
-                fishingMap2Unlocked = true;
-                StartQuest(QUEST_UNLOCK_MAP2);
-                Debug.Log("[QuestManager] Fishing map 2 unlocked!");
-                break;
-
-            case QUEST_CATCH_FISH:
-                Inventory inv = FindFirstObjectByType<Inventory>();
-                if (inv != null && inv.fish != null)
-                    inv.AddItem(inv.fish, 1);
-                break;
-        }
+        if (activeQuest == null) return "";
+        return activeQuest.questDescription;
     }
 }
