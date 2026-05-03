@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
 /// <summary>
@@ -6,7 +7,7 @@ using System.Collections.Generic;
 /// Persists via DontDestroyOnLoad.
 ///
 /// SETUP:
-///   - Create an empty GameObject in your first loaded scene (e.g. Main Menu or Hub), attach this.
+///   - Create an empty GameObject in your first loaded scene, attach this.
 ///   - Set targetWave in the Inspector.
 ///   - On your quest NPC, set npcID to "quest_npc_main".
 /// </summary>
@@ -22,14 +23,15 @@ public class QuestManager : MonoBehaviour
     // ── State ──────────────────────────────────────────────────
     private HashSet<string> activeQuests = new HashSet<string>();
     private HashSet<string> completedQuests = new HashSet<string>();
-
-    // NPCs that need CompleteQuest() called when they next appear in a scene
     private HashSet<string> pendingNPCCompletions = new HashSet<string>();
 
     public bool fishingMap2Unlocked { get; private set; } = false;
 
     [Header("Wave Quest Settings")]
     public int targetWave = 3;
+
+    [Header("Scene Names")]
+    public string hubSceneName = "HubArea";
 
     void Awake()
     {
@@ -74,17 +76,16 @@ public class QuestManager : MonoBehaviour
         {
             CompleteQuest(QUEST_BEAT_WAVE);
 
-            // Queue the NPC update — will be applied by HubQuestBridge when hub loads
+            // Queue NPC update for when hub loads
             pendingNPCCompletions.Add("quest_npc_main");
+
+            // Immediately return to hub
+            SceneManager.LoadScene(hubSceneName);
         }
     }
 
-    // ── Called by HubQuestBridge on scene load ─────────────────
+    // ── Called by HubQuestBridge on hub scene load ─────────────
 
-    /// <summary>
-    /// Returns the set of NPC IDs that need CompleteQuest() called.
-    /// HubQuestBridge calls this and clears it after applying.
-    /// </summary>
     public HashSet<string> GetAndClearPendingNPCCompletions()
     {
         var pending = new HashSet<string>(pendingNPCCompletions);
