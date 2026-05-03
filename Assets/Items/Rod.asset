@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Rod
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemName: Fishing Rod
-  icon: {fileID: 21300000, guid: 8832301ac89a34dd9afea187ce4d9505, type: 3}
+  icon: {fileID: -4442839526117404063, guid: a8dab5a42515b7544ba33d3f947457bd, type: 3}
   maxStackSize: 1
   description: this is a fishing rod
+  isEquipped: 1
