@@ -2,14 +2,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
+using static UnityEngine.RuleTile.TilingRuleOutput;
+
+// Needed to preview moves
+struct PreviewMove
+{
+    public Vector3Int from;
+    public Vector3Int to;
+}
 
 public class CucumberSpawner : MonoBehaviour
 {
     public Tilemap tilemap;
     public GameObject cucumber;
+    public ShakeCamera cameraShake;
+    public ComboUI comboUI;
 
     public float actionDelay = 5f;
 
@@ -36,18 +47,21 @@ public class CucumberSpawner : MonoBehaviour
 
     public ScoreManager scoreManager;
 
+    // Needed to preview moves
+    public GameObject ghostPrefab;
+    List<GameObject> ghosts = new List<GameObject>();
+
+    Vector3Int lastPreviewCell = Vector3Int.back;
     void Update()
     {
+        Vector3 mouseScreen = Mouse.current.position.ReadValue();
+        mouseScreen.z = -Camera.main.transform.position.z;
+
+        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(mouseScreen);
+        Vector3Int cellPos = tilemap.WorldToCell(mouseWorld);
         // MAIN CLICK LOGIC
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            Vector3 mouseScreen = Mouse.current.position.ReadValue();
-            mouseScreen.z = -Camera.main.transform.position.z; // correct depth
-
-            Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(mouseScreen);
-
-            Vector3Int cellPos = tilemap.WorldToCell(mouseWorld);
-
             // Cucumber only spawns on tiles that exist and another cucumber doesn't already exist
             GameObject target = GameObject.FindWithTag("Cucumber");
             if (tilemap.HasTile(cellPos) && target == null)
@@ -64,6 +78,93 @@ public class CucumberSpawner : MonoBehaviour
                     sr.sortingOrder = -(int)(spawnPos.y * 100);
             }
         }
+        // Preview next move
+        if (cellPos != lastPreviewCell)
+        {
+            Preview(cellPos);
+            lastPreviewCell = cellPos;
+        }
+    }
+
+    /// <summary>
+    /// Simulate a push on the current mouse position such that we know where the cats will end up
+    /// </summary>
+    /// <param name="startcell">mouse position</param>
+    /// <param name="dir">direction to push</param>
+    /// <returns>A list of all possible moves on current mouse position</returns>
+    List<PreviewMove> SimulatePush(Vector3Int startcell, Vector3Int dir)
+    {
+        var connected = GetConnectedCats(startcell);
+
+        List<Vector3Int> sorted = new List<Vector3Int>(connected);
+        sorted.Sort((a, b) => Dot(b, dir).CompareTo(Dot(a, dir)));
+
+        HashSet<Vector3Int> occupied = new HashSet<Vector3Int>(spawner.spawnedObjects.Keys);
+
+        List<PreviewMove> previewMoves = new List<PreviewMove>();
+
+        foreach (var cell in connected)
+        {
+            occupied.Remove(cell);
+        }
+
+        foreach (var cell in sorted)
+        {
+            Vector3Int target = cell + dir;
+
+            if (goalTileMap.HasTile(target))
+                continue;
+
+            if (!tilemap.HasTile(target) || occupied.Contains(target))
+                continue;
+
+            previewMoves.Add(new PreviewMove
+            {
+                from = cell,
+                to = target
+            });
+        }
+
+        return previewMoves;
+    }
+
+    void Preview(Vector3Int cellPos)
+    {
+        ClearPreview();
+
+        if (!tilemap.HasTile(cellPos)) return;
+
+        foreach (var dir in directions)
+        {
+            Vector3Int neighbor = cellPos + dir;
+
+            if (spawner.spawnedObjects.ContainsKey(neighbor))
+            {
+                var moves = SimulatePush(neighbor, dir);
+
+                foreach (var move in moves)
+                {
+                    HighlightGhost(move.to);
+                }
+            }
+        }
+    }
+
+    void HighlightGhost(Vector3Int cell)
+    {
+        Vector3 pos = tilemap.GetCellCenterWorld(cell);
+
+        GameObject ghost = Instantiate(ghostPrefab, pos, Quaternion.identity);
+        ghosts.Add(ghost);
+    }
+
+    void ClearPreview()
+    {
+        foreach (var g in ghosts)
+        {
+            if (g != null) Destroy(g);
+        }
+        ghosts.Clear();
     }
 
     /// <summary>
@@ -235,8 +336,8 @@ public class CucumberSpawner : MonoBehaviour
 
         foreach (var move in moves)
         {
-            move.obj.transform.position = move.newPos;
             spawner.spawnedObjects[move.newCell] = move.obj;
+            StartCoroutine(MoveSmooth(move.obj, move.newPos));
         }
 
         HandleCombo(toRemove);
@@ -251,12 +352,29 @@ public class CucumberSpawner : MonoBehaviour
         // Exponential score modifer
         int totalScore = scoreToAdd * comboCount * comboCount;
 
-        foreach (var cell in removedCells)
+        StartCoroutine(comboUI.ShowCombo(comboCount));
+
+        float shakeAmount = totalScore / comboCount;
+        if (comboCount <= 3)
         {
-            GameObject obj = spawner.spawnedObjects[cell];
-            Destroy(obj);
-            spawner.spawnedObjects.Remove(cell);
+            shakeAmount = shakeAmount / 2;
         }
+        else
+        {
+            shakeAmount = shakeAmount / 3f;
+        }
+        if (comboCount >= 2)
+        {
+            StartCoroutine(cameraShake.Shake(shakeAmount, 0.01f));
+        }
+
+        foreach (var cell in removedCells)
+            {
+                GameObject obj = spawner.spawnedObjects[cell];
+                Destroy(obj);
+                spawner.spawnedObjects.Remove(cell);
+                // StartCoroutine(cameraShake.Shake(shakeAmount, 0.01f));
+            }
 
         scoreManager.addScore(totalScore);
 
@@ -266,5 +384,19 @@ public class CucumberSpawner : MonoBehaviour
     int Dot(Vector3Int lhs, Vector3Int rhs)
     {
         return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+    }
+
+    IEnumerator MoveSmooth(GameObject obj, Vector3 target)
+    {
+        Vector3 start = obj.transform.position;
+        float t = 0;
+        float duration = 0.2f;
+
+        while (t < 1)
+        {
+            t += Time.deltaTime / duration;
+            obj.transform.position = Vector3.Lerp(start, target, t);
+            yield return null;
+        }
     }
 }
