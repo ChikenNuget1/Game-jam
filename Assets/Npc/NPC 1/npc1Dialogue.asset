@@ -14,12 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPCDialogue
   npcName: Npc1
   npcPortrait: {fileID: 0}
-  dialogueLines:
-  - Hello!
-  - This is test dialogue
-  - Goodbye!
-  autoProgressLines: 010001
   autoProgressDelay: 1.5
   typingSpeed: 0.05
   voiceSound: {fileID: 0}
   voicePitch: 1
+  introLines:
+  - test intro line
+  introAutoProgress: 01
+  hasQuest: 1
+  questActiveLines:
+  - go get me some cats
+  questActiveAutoProgress: 
+  questCompleteLines:
+  - here is your reward
+  questCompleteAutoProgress: 
+  postQuestLines:
+  - thank you
+  postQuestAutoProgress: 
