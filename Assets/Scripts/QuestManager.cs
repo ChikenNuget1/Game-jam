@@ -15,8 +15,6 @@ public class QuestManager : MonoBehaviour
 
     private HashSet<string> pendingNPCCompletions = new HashSet<string>();
 
-    public bool fishingMap2Unlocked { get; private set; } = false;
-
     void Awake()
     {
         if (Instance == null)
@@ -66,7 +64,6 @@ public class QuestManager : MonoBehaviour
     void CompleteActiveQuest()
     {
         questComplete = true;
-        fishingMap2Unlocked = true;
 
         Debug.Log($"[QuestManager] Quest complete: {activeQuest.questTitle}");
 

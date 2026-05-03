@@ -17,7 +17,7 @@ public class NPC : MonoBehaviour, IInteractable
 {
     [Header("Dialogue Data")]
     public NPCDialogue dialogueData;
-    public string npcID;
+    public string npcID = "quest_npc_main";
 
     [Header("Quest Pool")]
     public QuestDefinition[] questPool;

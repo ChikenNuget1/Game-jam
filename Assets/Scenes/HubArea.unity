@@ -361,9 +361,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::QuestManager
   hubSceneName: HubArea
-  <activeQuest>k__BackingField: {fileID: 0}
-  <questComplete>k__BackingField: 0
-  <fishingMap2Unlocked>k__BackingField: 0
 --- !u!4 &331987178
 Transform:
   m_ObjectHideFlags: 0
@@ -458,6 +455,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   dialogueData: {fileID: 11400000, guid: 3539f855dd18b4787b445cbcc4b0209d, type: 2}
+  npcID: quest_npc_main
+  questPool:
+  - {fileID: 11400000, guid: ffa78123a1ee1d04bb6ca84dd48d8ffd, type: 2}
+  - {fileID: 11400000, guid: 6bf03a1380b1f114cb5b924fd9cea245, type: 2}
+  - {fileID: 11400000, guid: ff55221752864a348b88f368d62c74b7, type: 2}
+  - {fileID: 11400000, guid: f95509921bd40314184adb6cd9e103a7, type: 2}
   dialoguePanel: {fileID: 972286129}
   dialogueText: {fileID: 1485648695}
   nameText: {fileID: 1782160854}
@@ -25301,6 +25304,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   dialogueData: {fileID: 11400000, guid: 8046f74351d5d4fd49cd8f356680a9a4, type: 2}
+  npcID: quest_npc_main
+  questPool:
+  - {fileID: 11400000, guid: ff55221752864a348b88f368d62c74b7, type: 2}
+  - {fileID: 11400000, guid: f95509921bd40314184adb6cd9e103a7, type: 2}
   dialoguePanel: {fileID: 972286129}
   dialogueText: {fileID: 1485648695}
   nameText: {fileID: 1782160854}
@@ -26638,8 +26645,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa7cd468939b0254d82f20279ef25456, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FishingMapSelector
-  map1SceneName: FishingMinigame
-  map2SceneName: FishingMap2
+  fishingSceneName: FishingMinigame
 --- !u!1 &1436174809
 GameObject:
   m_ObjectHideFlags: 0

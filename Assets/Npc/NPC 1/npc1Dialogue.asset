@@ -23,7 +23,7 @@ MonoBehaviour:
   introAutoProgress: 01
   hasQuest: 1
   questActiveLines:
-  - go get me some cats
+  - '{quest}'
   questActiveAutoProgress: 
   questCompleteLines:
   - here is your reward
