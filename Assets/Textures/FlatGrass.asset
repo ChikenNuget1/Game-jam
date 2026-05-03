@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13b75c95f34a00d4e8c04f76b73312e6, type: 3}
   m_Name: FlatGrass
   m_EditorClassIdentifier: Unity.2D.Tilemap.Extras::UnityEngine.Tilemaps.AnimatedTile
-  m_AnimatedSprites: []
+  m_AnimatedSprites:
+  - {fileID: -461265338, guid: 11582d443a79bb7469093905b555672a, type: 3}
+  - {fileID: 1984895161, guid: 11582d443a79bb7469093905b555672a, type: 3}
+  - {fileID: -615652571, guid: 11582d443a79bb7469093905b555672a, type: 3}
+  - {fileID: -248793214, guid: 11582d443a79bb7469093905b555672a, type: 3}
   m_MinSpeed: 1
   m_MaxSpeed: 1
   m_AnimationStartTime: 0

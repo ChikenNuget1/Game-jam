@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13b75c95f34a00d4e8c04f76b73312e6, type: 3}
   m_Name: FlatSan
   m_EditorClassIdentifier: Unity.2D.Tilemap.Extras::UnityEngine.Tilemaps.AnimatedTile
-  m_AnimatedSprites: []
+  m_AnimatedSprites:
+  - {fileID: 2147251748, guid: b24c574f914a8e04e98c3bb6ffcd19d0, type: 3}
+  - {fileID: -418428813, guid: b24c574f914a8e04e98c3bb6ffcd19d0, type: 3}
+  - {fileID: -649958061, guid: b24c574f914a8e04e98c3bb6ffcd19d0, type: 3}
+  - {fileID: 976094391, guid: b24c574f914a8e04e98c3bb6ffcd19d0, type: 3}
   m_MinSpeed: 1
   m_MaxSpeed: 1
   m_AnimationStartTime: 0
