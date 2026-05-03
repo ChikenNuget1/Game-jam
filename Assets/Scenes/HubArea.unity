@@ -456,7 +456,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   dialogueData: {fileID: 11400000, guid: 3539f855dd18b4787b445cbcc4b0209d, type: 2}
   npcID: quest_npc_main
-  questPool: []
+  questPool:
+  - {fileID: 11400000, guid: ff55221752864a348b88f368d62c74b7, type: 2}
+  - {fileID: 11400000, guid: f95509921bd40314184adb6cd9e103a7, type: 2}
+  - {fileID: 11400000, guid: ffa78123a1ee1d04bb6ca84dd48d8ffd, type: 2}
+  - {fileID: 11400000, guid: 6bf03a1380b1f114cb5b924fd9cea245, type: 2}
   dialoguePanel: {fileID: 972286129}
   dialogueText: {fileID: 1485648695}
   nameText: {fileID: 1782160854}
