@@ -76,7 +76,11 @@ public class WaveManager : MonoBehaviour
     // Initialise new wave
     void nextWave()
     {
+
         waveNumber++;
+        if (QuestManager.Instance != null)
+            QuestManager.Instance.OnWaveCompleted(waveNumber);
+
         clearAllCats();
         spawnNewWave();
         timerManager.addTime(waveNumber);

@@ -1,16 +1,17 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TimerManager : MonoBehaviour
 {
     public float timeRemaining = 60f;
     public bool isRunning = true;
-
     public TextMeshProUGUI timerText;
-
     public WaveManager waveManager;
 
-    // Update is called once per frame
+    [Header("Scene Names")]
+    public string hubSceneName = "HubArea";
+
     void Update()
     {
         if (!isRunning) return;
@@ -21,9 +22,9 @@ public class TimerManager : MonoBehaviour
         {
             timeRemaining = 0;
             isRunning = false;
-
             gameOver();
         }
+
         updateUI();
     }
 
@@ -39,8 +40,8 @@ public class TimerManager : MonoBehaviour
 
     void gameOver()
     {
-        Debug.Log("Game Over");
-
+        Debug.Log("Game Over — returning to hub");
         waveManager.enabled = false;
+        SceneManager.LoadScene(hubSceneName);
     }
 }
