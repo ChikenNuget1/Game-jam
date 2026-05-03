@@ -27,6 +27,8 @@ public class Spawner : MonoBehaviour
         new Vector3Int(-1, -1, 0), */
     };
 
+    public Sprite[] catSprites;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -64,13 +66,20 @@ public class Spawner : MonoBehaviour
 
         // Spawn object
         GameObject obj = Instantiate(cat, spawnPos, Quaternion.identity);
+        obj.transform.localScale = new Vector3(3f, 3f, 3f);
+
         //cucumberSpawner.spawnedObjects[randomCell] = obj;
         spawnedObjects[randomCell] = obj;
 
         // Layering order
-        SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+        SpriteRenderer sr = obj.GetComponentInChildren<SpriteRenderer>();
         if (sr != null)
-            sr.sortingOrder = -(int)(spawnPos.y * 100);
+        {
+            int index = Random.Range(0, catSprites.Length);
+            sr.sprite = catSprites[index];
+            sr.sortingOrder = -(int)(spawnPos.y);
+        }
+            
     }
 
     bool isSafeTile(Vector3Int cell)
