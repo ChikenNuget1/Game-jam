@@ -26105,6 +26105,7 @@ GameObject:
   - component: {fileID: 1270845401}
   - component: {fileID: 1270845400}
   - component: {fileID: 1270845399}
+  - component: {fileID: 1270845403}
   m_Layer: 0
   m_Name: Circle
   m_TagString: Untagged
@@ -26124,8 +26125,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84df59fb23e4ae24f951de9412bd3d63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  moveSpeed: 2
+  moveSpeed: 1
   canMove: 1
+  spriteRenderer: {fileID: 1270845401}
 --- !u!50 &1270845400
 Rigidbody2D:
   serializedVersion: 5
@@ -26228,6 +26230,28 @@ Transform:
   - {fileID: 1833845880}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &1270845403
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1270845398}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 53aac5effc8d18942bd0566e07a4d63e, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1308798111
 GameObject:
   m_ObjectHideFlags: 0
