@@ -1,8 +1,14 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
+/// <summary>
+/// FishingMinigameController — same as original, but:
+///   • FadeAndLoad now loads the main gameplay scene
+///   • mainGameplaySceneName is a serialized field so you can set it in Inspector
+///   • Catching a fish completes QUEST_CATCH_FISH if it's active
+/// </summary>
 public class FishingMinigameController : MonoBehaviour
 {
     public GameObject hookPrefab;
@@ -10,6 +16,9 @@ public class FishingMinigameController : MonoBehaviour
     public Slider chargeBar;
     public LineRenderer fishingLine;
     public Image fadePanel;
+
+    [Header("Scene Names")]
+    public string mainGameplaySceneName = "Fishing"; // set to your main gameplay scene name
 
     float force = 0f;
     bool isCharging = false;
@@ -19,7 +28,6 @@ public class FishingMinigameController : MonoBehaviour
     {
         fishingLine.positionCount = 2;
         fishingLine.enabled = false;
-
         Color c = fadePanel.color;
         c.a = 0f;
         fadePanel.color = c;
@@ -54,10 +62,8 @@ public class FishingMinigameController : MonoBehaviour
     {
         activeHook = Instantiate(hookPrefab, rodTip.position, Quaternion.identity);
         Rigidbody2D rb = activeHook.GetComponent<Rigidbody2D>();
-
         Vector2 tossDirection = new Vector2(0.3f, 2.5f).normalized;
         rb.AddForce(tossDirection * force, ForceMode2D.Impulse);
-
         fishingLine.enabled = true;
         StartCoroutine(WaitForHookToLand());
     }
@@ -69,14 +75,17 @@ public class FishingMinigameController : MonoBehaviour
         while (activeHook != null)
         {
             Rigidbody2D rb = activeHook.GetComponent<Rigidbody2D>();
-
             if (rb.bodyType == RigidbodyType2D.Static)
             {
+                // ── QUEST HOOK ──────────────────────────────────────────
+                if (QuestManager.Instance != null)
+                    QuestManager.Instance.CompleteQuest(QuestManager.QUEST_CATCH_FISH);
+                // ────────────────────────────────────────────────────────
+
                 yield return new WaitForSeconds(3f);
                 StartCoroutine(FadeAndLoad());
                 yield break;
             }
-
             yield return null;
         }
     }
@@ -95,6 +104,6 @@ public class FishingMinigameController : MonoBehaviour
             yield return null;
         }
 
-        SceneManager.LoadScene("Fishing");
+        SceneManager.LoadScene(mainGameplaySceneName);
     }
 }

@@ -331,6 +331,64 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &331987175
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 331987178}
+  - component: {fileID: 331987177}
+  - component: {fileID: 331987176}
+  m_Layer: 0
+  m_Name: QuestManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &331987176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 331987175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1360e41f1bcf1b84997f7397fb7ba6ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+--- !u!114 &331987177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 331987175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48bc2d018fb8bc7488f6a29bbb06a08f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QuestManager
+  targetWave: 3
+--- !u!4 &331987178
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 331987175}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.21147, y: 0.26199, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &357795598
 GameObject:
   m_ObjectHideFlags: 0
@@ -410,7 +468,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   dialogueData: {fileID: 11400000, guid: 3539f855dd18b4787b445cbcc4b0209d, type: 2}
-  npcID: npc2
+  npcID: quest_npc_main
+  questIDToStart: 
   dialoguePanel: {fileID: 972286129}
   dialogueText: {fileID: 1485648695}
   nameText: {fileID: 1782160854}
@@ -2516,6 +2575,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   dialogueData: {fileID: 11400000, guid: 8046f74351d5d4fd49cd8f356680a9a4, type: 2}
   npcID: npc1
+  questIDToStart: 
   dialoguePanel: {fileID: 972286129}
   dialogueText: {fileID: 1485648695}
   nameText: {fileID: 1782160854}
@@ -3766,6 +3826,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1402240048}
   - component: {fileID: 1402240047}
+  - component: {fileID: 1402240049}
   m_Layer: 0
   m_Name: FishingTransitionArea
   m_TagString: Untagged
@@ -3840,6 +3901,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1402240049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1402240046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa7cd468939b0254d82f20279ef25456, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FishingMapSelector
+  map1SceneName: FishingMinigame
+  map2SceneName: FishingMap2
 --- !u!1 &1436174809
 GameObject:
   m_ObjectHideFlags: 0
@@ -4808,3 +4883,4 @@ SceneRoots:
   - {fileID: 1402240048}
   - {fileID: 484782548}
   - {fileID: 1436174811}
+  - {fileID: 331987178}

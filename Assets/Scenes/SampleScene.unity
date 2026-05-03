@@ -262,6 +262,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   dialogueData: {fileID: 11400000, guid: 8046f74351d5d4fd49cd8f356680a9a4, type: 2}
+  npcID: NPC1
   dialoguePanel: {fileID: 1328754903}
   dialogueText: {fileID: 424705205}
   nameText: {fileID: 1289196897}
@@ -3485,6 +3486,7 @@ GameObject:
   - component: {fileID: 1694073149}
   - component: {fileID: 1694073148}
   - component: {fileID: 1694073147}
+  - component: {fileID: 1694073152}
   m_Layer: 0
   m_Name: NPC 2
   m_TagString: Untagged
@@ -3551,6 +3553,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   dialogueData: {fileID: 11400000, guid: 3539f855dd18b4787b445cbcc4b0209d, type: 2}
+  npcID: quest_npc_main
   dialoguePanel: {fileID: 1328754903}
   dialogueText: {fileID: 424705205}
   nameText: {fileID: 1289196897}
@@ -3667,6 +3670,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1694073152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1694073146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa7cd468939b0254d82f20279ef25456, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  map1SceneName: FishingMap1
+  map2SceneName: FishingMap2
 --- !u!114 &1736179895
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4062,6 +4079,51 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
   m_Asset: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_ActionId: 15cef263-9014-4fd5-94d9-4e4a6234a6ef
+--- !u!1 &2045890100
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2045890102}
+  - component: {fileID: 2045890101}
+  m_Layer: 0
+  m_Name: QuestManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2045890101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2045890100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48bc2d018fb8bc7488f6a29bbb06a08f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  targetWave: 3
+--- !u!4 &2045890102
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2045890100}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.02381, y: 0.03124, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2132105454
 GameObject:
   m_ObjectHideFlags: 0
@@ -4150,3 +4212,4 @@ SceneRoots:
   - {fileID: 537367715}
   - {fileID: 38533728}
   - {fileID: 1694073151}
+  - {fileID: 2045890102}

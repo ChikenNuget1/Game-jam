@@ -1,13 +1,24 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using TMPro;
 using UnityEngine.UI;
 
+/// <summary>
+/// NPC — same as original with one addition:
+///   • questIDToStart field in Inspector
+///   • When intro dialogue is seen for the first time, starts that quest in QuestManager
+/// </summary>
 public class NPC : MonoBehaviour, IInteractable
 {
     [Header("Dialogue Data")]
     public NPCDialogue dialogueData;
     public string npcID;
+
+    [Header("Quest")]
+    // Set this to the quest ID this NPC should start when intro is first seen.
+    // Leave blank if this NPC doesn't start a quest.
+    // Example: "quest_beat_wave"
+    public string questIDToStart;
 
     [Header("UI")]
     public GameObject dialoguePanel;
@@ -70,6 +81,13 @@ public class NPC : MonoBehaviour, IInteractable
         {
             questState.introSeen = true;
             SaveState();
+
+            // ── QUEST START HOOK ────────────────────────────────────
+            // Start the quest the first time the player talks to this NPC
+            if (!string.IsNullOrEmpty(questIDToStart) && QuestManager.Instance != null)
+                QuestManager.Instance.StartQuest(questIDToStart);
+            // ────────────────────────────────────────────────────────
+
             return dialogueData.hasQuest
                 ? CombineLines(dialogueData.introLines, dialogueData.questActiveLines)
                 : dialogueData.introLines;
